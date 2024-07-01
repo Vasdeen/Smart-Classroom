@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Расписание</title>
+    
+</head>
+<link rel="stylesheet" href="mainpage_style3-1.css">
+<body>
+    <div class="header">
+        <div id="title">1-334</div>
+        <div id="climate">2</div>
+        <div id="info">2 практика - Вильцын Станислав Анатольевич</div>
+    </div>
+    <div class="content">
+        <div class="left"><div id="left" class="left-column-container">БПОи-20-01</div></div>
+        <div class="center" id="center2"><small id="center3">Интернет вещей</small>
+            <br>
+            <small id="center">Практика</small>
+        </div>
+        <div class="right"><div id="right">10:30 - 12:05</div></div>
+    </div>
+    <div class="table-container">
+        <table id="dynamic-table">
+            <!-- Таблица будет заполнена динамически -->
+            <!-- Таблица будет заполнена динамически -->
+        </table>
+    </div>
+    <script type="module" src="./dataReading.js"> console.log(entireLessonData);
+    </script>
+
+
+
+    <!-- предположительно скрипт индекса находится тут-->
+
+    <script src="https://www.gstatic.com/firebasejs/7.14.6/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.14.6/firebase-database.js"></script>
+
+    <script>
+
+const firebaseConfig = {
+    apiKey: "AIzaSyDsu2cHBJuget5uyIf3abTrs2wZJqhLR7g",
+    authDomain: "smau-temp.firebaseapp.com",
+    databaseURL: "https://smau-temp-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "smau-temp",
+    storageBucket: "smau-temp.appspot.com",
+    messagingSenderId: "208565502888",
+    appId: "1:208565502888:web:4df62cc01d3ebf4729539d",
+    measurementId: "G-FWJBGEFGFY"
+  };
+
+    function dbConnect(){
+    firebase.initializeApp(firebaseConfig)
+        var database = firebase.database()
+        return database
+    }
+    var database = dbConnect()
+
+
+    
+    async function readFromDB(routeDB) {
+    return new Promise((resolve, reject) => {
+        // simulate asynchronous operation
+        var result;
+        var teacher_ref = database.ref(routeDB);
+        teacher_ref.on('value', (snapshot) => {
+                    var data = snapshot.val();
+                  if (data == null){
+                    console.log("ошибка");
+                  }
+                  else {
+                    result = data;
+                  }
+                  resolve(result);
+                });
+    });
+}      
+    var groupName;
+    var today;
+    var entryStatus;
+    var pairNumber;
+    var pairSync;
+    var pairInfo;
+    async function pairInfoGetter(){
+        pairInfo = await readFromDB("/auditorium/1-333/lastSync/");
+        console.log("ее пейринфо" + pairInfo);
+        console.log(pairInfo);
+        console.log(pairInfo.lastPairNumber)
+    }
+    
+  async function checkJournals(){
+    await pairInfoGetter();
+    dateToday = new Date();
+    today = dateToday.getDate();
+    today = today + "-" + (dateToday.getMonth()+1)	
+    today = today + "-" + (dateToday.getFullYear())	
+    // groupName = document.getElementById("left").innerText;
+    // console.log(groupName + "LessonTeacher sdata")
+    // var groupIndex = groupName.indexOf("‧");
+    // groupName = groupName.slice(groupIndex+1);
+    groupName = pairInfo.lastGroup;
+    console.log('journals/'+groupName+'/'+today);
+    
+    pairNumber = pairInfo.lastPairNumber;
+
+    var pairJournalEntry = await readFromDB('journals/'+groupName+'/'+today+'/'+pairNumber);
+
+
+    let pairArrayTest = [];
+    
+      for (let i in pairJournalEntry){
+      pairArrayTest.push([i, pairJournalEntry [i]]);
+    }
+    return pairArrayTest;
+  }
+    
+  async function checkGroup(groupName){
+  var groupInfoEntry = await readFromDB('groups/'+groupName);
+  
+  if (groupInfoEntry == undefined) {
+    database.ref('groups/' + groupName).update({
+      count: 0
+    })
+    groupInfoEntry = await readFromDB('groups/'+groupName);
+    }
+  return groupInfoEntry;  
+}
+
+
+  async function loadGroup(groupName){
+  var groupStudents = await checkGroup(groupName);
+  var studentString = " ";
+  studentArray = Object.entries(groupStudents);
+    for (let i = 0; i <= groupStudents.count-1; i++)
+    {
+    studentString = studentString + studentArray[i][1].surname + " " + studentArray[i][1].name  +  " " + studentArray[i][1].patronym + "\n";  
+    }
+  return studentArray
+}
+
+
+// async function addSubjectToTeacher(subjectName, groupName, teacherPosition){
+//     var subjectInfoEntry = await readFromDB('teachers/' + teacherPosition + '/subjects');
+//     console.log(subjectInfoEntry);
+//     var subjPosition = subjectInfoEntry.count
+//     await database.ref('teachers/' + teacherPosition + '/subjects/' + subjPosition).update({
+//       name: subjectName,
+//       groupName: groupName
+//     })
+//     await database.ref('teachers/' + teacherPosition + '/subjects').update({
+//       count: subjPosition + 1
+//     })
+//     //groupInfoEntry = await readFromDB('groups/'+groupName);
+// }
+
+// async function checkTeacher(testRFID, groupName, today, pairNumber){
+//   var teachers = await readFromDB('teachers/');
+//   teacherStatus = 0;
+//   teacherPosition = -1;
+//   subjectStatus = 0;
+//   teacherArray = await Object.entries(teachers);
+//   await teacherArray.pop();
+//   console.log(teacherArray);
+//   for (let i in teacherArray){
+//     if (teacherArray[i][1].rfid == testRFID) {
+//         teacherStatus = await 1;
+//         teacherPosition = await i;
+//     }
+
+//   }
+//   if (teacherStatus = 1) {
+//     subjectName = await readFromDB('journals/'+groupName+'/'+today+'/'+pairNumber);
+//     subjectName = await subjectName.subject;
+//     console.log(teacherArray[teacherPosition][1].subjects)
+//     for (k in teacherArray[teacherPosition][1].subjects){
+//         if (teacherArray[teacherPosition][1].subjects[k].name == subjectName && teacherArray[teacherPosition][1].subjects[k].groupName == groupName) {
+//         console.log ("ОН ЕСТЬ!!");
+//         subjectStatus = 1;
+//     }
+//     else {
+//         // console.log(subjectName)
+//         // console.log(teacherArray[teacherPosition][1].subjects[0].name)
+//         // console.log(teacherArray[teacherPosition][1].subjects[0].groupName)
+//         // console.log(groupName)
+//         console.log ("ЕГО НЕТ!!");  
+//     };
+//     if (subjectStatus == 0) addSubjectToTeacher(subjectName, groupName, teacherPosition);
+//     }
+    
+    
+//     //console.log(subjectName);
+//   }
+//   return teacherStatus;
+// }
+
+
+    async function loadSite(){
+    
+    var studentsOnPairForTable = await checkJournals();
+    await studentsOnPairForTable.pop();
+    var studentsInGroupForTable = await loadGroup(groupName);
+    await studentsInGroupForTable.pop();
+    var names = await [];
+    for (i in studentsInGroupForTable) {
+        names[i] = await studentsInGroupForTable[i][1].surname; 
+    }
+    var pairJournalEntryChecking = await readFromDB('journals/'+groupName+'/'+today+'/'+pairNumber);
+    subjectName = await pairJournalEntryChecking.subject;
+    var allSubjectEntries = await  readFromDB('journals/'+groupName);
+    var allSubjectEntriesArray = await Object.entries(allSubjectEntries);
+    await allSubjectEntriesArray.pop();
+    var allSubjectEntriesMarks = [];
+    for (i in names){
+        await allSubjectEntriesMarks.push([])
+    }
+    for (i in allSubjectEntriesArray){
+        var subjectPairNum = 0;
+        for (j in allSubjectEntriesArray[i][1]){
+             await console.log(allSubjectEntriesArray[i][1][j].subject);
+             if (allSubjectEntriesArray[i][1][j].subject !=undefined) {
+                subjectPairNum +=1;
+                for (k in allSubjectEntriesArray[i][1][j]) {
+                    if (allSubjectEntriesArray[i][1][j][k].mark >=0){
+                    await allSubjectEntriesMarks[k].push([subjectPairNum, allSubjectEntriesArray[i][1][j][k].mark]);
+                }
+                }
+             }
+        }
+    }
+    var subjectLessonsNumber = allSubjectEntriesMarks[0].length;
+    var dates = [];
+    for (i = 1;  i<= subjectLessonsNumber; i++){
+        dates.push(i);
+    }
+    var data2 = [];
+    for ( j in allSubjectEntriesMarks){
+            await data2.push([]);
+    }
+    for ( j in allSubjectEntriesMarks){
+        for (i in dates){
+            await data2[j].push(allSubjectEntriesMarks[j][i][1]);
+        }
+    }
+    createTable(data2, dates, names, studentsInGroupForTable, studentsOnPairForTable);
+    }
+    const climate = document.getElementById('climate');
+    //setTimeout(loadSite, 1);
+    loadSite()
+        async function createTable(data, dates, names, studentsInGroupForTable, studentsOnPairForTable) {
+            const table = document.getElementById('dynamic-table');
+            table.innerHTML = ""
+            const thead = document.createElement('thead');
+            const tbody = document.createElement('tbody');
+            studentsOnPairForTable.pop()
+            const trHead = document.createElement('tr');
+            trHead.innerHTML = `<th></th>${dates.map(date => `<th>${date}</th>`).join('')}`;
+            thead.appendChild(trHead);
+            var starParam = '';
+            var attendanceParam = '';
+            names.forEach((name, index, h) => {
+                attendanceParam = '';
+                if (studentsOnPairForTable[index][1].absence == 1) { attendanceParam = ' class="attendance1"';}
+                else if (studentsOnPairForTable[index][1].absence == 2) { attendanceParam = ' class="attendance2"';}
+                const tr = document.createElement('tr');
+        tr.innerHTML = `<th${attendanceParam}>${name}</th>` + data[index].map(cellContent => {
+            let starParam = 'No';
+            if (cellContent == 3) {
+                starParam = '3';
+            } else if (cellContent == 4) {
+                starParam = '4';
+            } else if (cellContent == 5) {
+                starParam = '5';
+            }
+            //return starParam ? `<td><img class="starImg3"></td>` : '<td></td>';
+            return starParam ? `<td><img class="starImg" src="star${starParam}.png"></td>` : '<td></td>';
+            // return starParam ? `<td><img class="starImg${"starParam"}" src="star1.png">` : '<img></img>';</td>` : '<td></td>';
+            //return starParam ? `<td class="star${"starParam"}">&#9733</td>` : '<td></td>';
+        }).join('');
+        tbody.appendChild(tr);
+            });
+            table.innerHTML = ""
+            table.appendChild(thead);
+            table.appendChild(tbody);
+            var climateData = await readFromDB("/climate_reports/latest")
+            console.log(await climateData);
+            climate.innerText = "               t° = " + climateData.temperature.toString().slice(0, 4) + "; φ = " + climateData.humidity.toString().slice(0, 4) ;
+        //     checkkingTeachers = checkTeacher(23235, groupName, today, pairNumber);
+        // console.log(checkkingTeachers);
+        }
+//         setTimeout(function(){
+//     //location.reload();
+//     loadSite();
+// }, 3000);
+
+function doSomething() {
+    console.log("10 seconds");
+    loadSite();
+    setTimeout(doSomething, 1000);
+}
+
+setTimeout(doSomething, 1000);
+        // setInterval(loadSite(), 5000)
+    </script>
+
+<script type="module" src="./dataReadingAfter.js"> </script>
+<script>
+    
+var table = document.getElementById("dynamic-table");
+////
+// var raspDateElem = document.getElementById("info");
+//     var raspLessonNameElem = document.getElementById("center3");
+//     var raspLessonTimeElem = document.getElementById("right");
+//     var raspLessonTeacherElem = document.getElementById("left");
+
+// //     var raspDateElem = document.getElementById("raspDate");
+// //   var raspLessonNameElem = document.getElementById("raspLessonName");
+// //   var raspLessonTimeElem = document.getElementById("raspLessonTime");
+// //   var raspLessonTeacherElem = document.getElementById("raspLessonTeacher");
+
+//     raspDateElem.innerText = data.raspDate;
+//     raspLessonNameElem.innerText = data.lessonName;
+//     raspLessonTimeElem.innerText = data.lessonTime;
+//     raspLessonTeacherElem.innerText = data.lessonTeacher;
+///
+</script>
+
+</body>
+</html>

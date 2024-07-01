@@ -1,0 +1,93 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+    background-color: #0F292F; /* Тёмно-синий фон */
+    color: #CCCCCC; /* Светлый серый текст */
+    justify-content: center; /* Центрируем по вертикали */
+    align-items: center; /* Центрируем по горизонтали */
+}
+.header {
+    background-color: #CB2D6F; /* Тёмно-розовый */
+    color: #CCCCCC; /* Светлый серый текст */
+    padding: 10px 20px;
+    text-align: left;
+    font-size: 1.5em;
+    width: 90%; /* Ширина 90% */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px; /* Отступ снизу */
+    box-sizing: border-box;
+}
+.content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #501F3A; /* Тёмно-пурпурный */
+    padding: 10px 20px;
+    width: 90%; /* Ширина 90% */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    box-sizing: border-box;
+    margin-bottom: 20px; /* Отступ снизу */
+}
+.content div {
+    background-color: #14A098; /* Тёмно-зелёный */
+    color: #CCCCCC; /* Светлый серый текст */
+    padding: 10px;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+.left, .right {
+    flex-basis: 20%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+}
+.left div, .right div {
+    width: 100%;
+    text-align: center;
+    font-size: 1.2em;
+}
+.center {
+    flex-basis: 50%;
+    text-align: center;
+    box-sizing: border-box;
+}
+.table-container {
+    background-color: #CCCCCC; /* Светлый серый фон */
+    padding: 10px 20px;
+    width: 90%; /* Ширина 90% */
+    overflow-x: auto;
+    flex-grow: 1;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+table {
+    border-collapse: separate;
+    border-spacing: 10px;
+    width: 100%;
+}
+th, td {
+    background-color: #501F3A; /* Тёмно-пурпурный */
+    text-align: center;
+    padding: 10px;
+    border-radius: 5px;
+    position: relative;
+}
+th {
+    background-color: #CB2D6F; /* Тёмно-розовый */
+    color: #CCCCCC; /* Светлый серый текст */
+}
+.star {
+    color: #14A098; /* Тёмно-зелёный */
+    font-size: 1.5em;
+}
+ 

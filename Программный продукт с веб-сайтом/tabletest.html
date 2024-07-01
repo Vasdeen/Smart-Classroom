@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Таблица с ФИО и датами</title>
+  <style>
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+    th, td {
+      border: 1px solid black;
+      padding: 8px;
+      text-align: center;
+    }
+    th:first-child {
+      padding-right: 20px;
+    }
+  </style>
+</head>
+<body>
+  <table id="dataTable">
+    <thead>
+      <tr>
+        <th>ФИО</th>
+        <!-- Генерация заголовков столбцов с датами -->
+        <th>1.03</th>
+        <th>2.03</th>
+        <th>3.03</th>
+        <th>4.03</th>
+        <th>5.03</th>
+        <th>6.03</th>
+        <th>7.03</th>
+        <th>8.03</th>
+        <th>9.03</th>
+        <th>10.03</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Данные будут добавлены динамически с помощью JavaScript -->
+    </tbody>
+  </table>
+
+  <script>
+    // Пример данных для таблицы
+    const tableData = [
+      { name: 'Иванов Иван Иванович', day1: { lateStatus: 'late', grade: 0 }, day2: { lateStatus: 'onTime', grade: 1 }, day3: { lateStatus: 'onTime', grade: 0 }, day4: { lateStatus: 'late', grade: 1 }, day5: { lateStatus: 'late', grade: 0 }, day6: { lateStatus: 'onTime', grade: 1 }, day7: { lateStatus: 'late', grade: 0 }, day8: { lateStatus: 'onTime', grade: 1 }, day9: { lateStatus: 'onTime', grade: 0 }, day10: { lateStatus: 'late', grade: 1 } },
+      { name: 'Петров Петр Петрович', day1: { lateStatus: 'onTime', grade: 1 }, day2: { lateStatus: 'late', grade: 0 }, day3: { lateStatus: 'onTime', grade: 1 }, day4: { lateStatus: 'late', grade: 1 }, day5: { lateStatus: 'late', grade: 0 }, day6: { lateStatus: 'onTime', grade: 1 }, day7: { lateStatus: 'late', grade: 1 }, day8: { lateStatus: 'onTime', grade: 0 }, day9: { lateStatus: 'onTime', grade: 1 }, day10: { lateStatus: 'late', grade: 0 } },
+      { name: 'Сидоров Сидор Сидорович', day1: { lateStatus: 'late', grade: 0 }, day2: { lateStatus: 'onTime', grade: 1 }, day3: { lateStatus: 'late', grade: 1 }, day4: { lateStatus: 'late', grade: 1 }, day5: { lateStatus: 'onTime', grade: 0 }, day6: { lateStatus: 'late', grade: 0 }, day7: { lateStatus: 'onTime', grade: 1 }, day8: { lateStatus: 'late', grade: 0 }, day9: { lateStatus: 'late', grade: 1 }, day10: { lateStatus: 'onTime', grade: 1 } }
+    ];
+
+    // Функция для определения цвета строки в зависимости от lateStatus и текущего дня
+    function getRowColor(lateStatus, currentDay) {
+      if (lateStatus === 'late' && currentDay === 1) {
+        return 'red'; // Красный цвет для опоздавших в первый день
+      } else if (lateStatus === 'onTime' && currentDay === 1) {
+        return 'green'; // Зеленый цвет для вовремя пришедших в первый день
+      } else {
+        return 'black'; // Черный цвет по умолчанию
+      }
+    }
+
+    // Функция для отображения данных в таблице
+    function renderTable(data, currentDay) {
+      const tableBody = document.querySelector('#dataTable tbody');
+      tableBody.innerHTML = ''; // Очищаем содержимое tbody
+
+      data.forEach(rowData => {
+        const row = document.createElement('tr');
+
+        // Создаем ячейку для ФИО
+        const nameCell = document.createElement('td');
+        nameCell.textContent = rowData.name;
+        nameCell.style.color = getRowColor(rowData['day' + currentDay].lateStatus, currentDay);
+        row.appendChild(nameCell);
+
+        // Создаем ячейки для дат
+        for (let i = 1; i <= 10; i++) {
+          const dateCell = document.createElement('td');
+          dateCell.textContent = rowData['day' + i].grade; // Выводим значение переменной grade
+          row.appendChild(dateCell);
+        }
+
+        tableBody.appendChild(row);
+      });
+    }
+
+    // Переменная для определения текущего дня
+    const currentDay = 3;
+
+    // Отображаем таблицу при загрузке страницы
+    renderTable(tableData, currentDay);
+  </script>
+</body>
+</html>

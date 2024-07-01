@@ -1,0 +1,191 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+    /* background-color: #0F292F;  */
+    background-color: #FFFFFF; 
+    background-color: #DDDDDD; 
+    /* color: #DDDDDD;  */
+    color: #ffffff;
+    justify-content: center; 
+    align-items: center; 
+}
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    /* background-color: #CB2D6F; */
+    background-color: #14A098;
+    
+    /* color: #DDDDDD;  */ 
+    color: #ffffff; 
+    padding: 10px 20px;
+    text-align: left;
+    font-size: 1.5em; 
+    width: 90%; 
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px; 
+    box-sizing: border-box;
+    border-radius: 8px; 
+}
+.header #info {
+    font-size: 1em; 
+}
+.header #title {
+    font-size: 1.5em; 
+}
+.content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    /* color: #DDDDDD;  */ 
+    /* background-color: #ffffff;  */
+    background-color: #0F292F;
+    padding: 10px 20px;
+    width: 90%; 
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    box-sizing: border-box;
+    margin-bottom: 20px; 
+}
+.content div {
+    background-color: #14A098; 
+    /* color: #DDDDDD;  */
+    color: #ffffff; 
+    padding: 15px; 
+    border-radius: 5px;
+    box-sizing: border-box;
+    font-size: 1.5em; 
+}
+.content #left {
+    font-size: 1.5em; 
+}
+.content #center {
+    font-size: 1.5em; 
+}
+.content #right {
+    font-size: 1.5em; /* Увеличенный размер текста */
+}
+.left, .right {
+    flex-basis: 20%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+}
+.left div, .right div {
+    width: 100%;
+    text-align: center;
+    font-size: 1.5em; /* Увеличенный размер текста */
+}
+.center {
+    flex-basis: 50%;
+    text-align: center;
+    box-sizing: border-box;
+}
+.table-container {
+    /* background-color: #CCCCCC; Светлый серый фон */
+    /* background-color: #ffffff;  */
+    background-color: #0F292F;
+    padding: 10px 20px;
+    width: 90%; /* Ширина 90% */
+    overflow-x: auto;
+    flex-grow: 1;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+table {
+    border-collapse: separate;
+    border-spacing: 10px;
+    width: 100%;
+}
+th, td {
+    /* background-color: #0F292F;  */
+    background-color: #ffffff; 
+    background-color: #dddddd; 
+    
+    /* background-color: #501F3A; Тёмно-пурпурный */
+    text-align: center;
+    padding: 15px; /* Увеличенный размер отступов */
+    border-radius: 5px;
+    position: relative;
+    font-size: 1.5em; /* Увеличенный размер текста */
+}
+th {
+    background-color: #14A098; 
+    
+    /* background-color: #CB2D6F; Тёмно-розовый */
+    /* color: #DDDDDD; Светлый серый текст */
+    color: #ffffff; 
+}
+.star {
+    color: rgba(0, 0, 0, 0); 
+    font-size: 4em; /* Увеличенный размер текста */
+    /* content-visibility: hidden; */
+}
+.star3 {
+    color: #14A098; /* Тёмно-зелёный */
+    font-size: 4em; /* Увеличенный размер текста */
+    -webkit-text-stroke-width: 1px;
+            -webkit-text-stroke-color: rgb(0, 0, 0);
+}
+.star4 {
+    color: #ffc800; /* Тёмно-зелёный */
+    font-size: 4em; /* Увеличенный размер текста */
+    -webkit-text-stroke-width: 1px;
+            -webkit-text-stroke-color: rgb(0, 0, 0);
+}
+.star5 {
+    color: #ff0000; /* Тёмно-зелёный */
+    font-size: 4em; /* Увеличенный размер текста */
+    -webkit-text-stroke-width: 1px;
+            -webkit-text-stroke-color: rgb(0, 0, 0);
+}
+.starImg {
+    width: 100px;
+  height: auto
+}
+.starImg3 {
+    width: 100px;
+  height: auto
+}
+.starImg4 {
+    width: 100px;
+  height: auto
+}
+.starImg5 {
+    width: 100px;
+  height: auto
+}
+.attendance1{
+    /* color: #00fff2 */
+    color: #000000;
+    /* text-shadow: 0 0 3px #ffffff, 0 0 10px #ffffff; */
+    text-shadow: 0 0 3px #ffffff, 0 0 72px #ffffff;
+    
+    /* вовремя */
+    /* -webkit-text-stroke-width: 1px;
+            -webkit-text-stroke-color: rgb(255, 255, 255); */
+}
+.attendance2{
+    /* color: #ffee00; */
+    color: #ffee00;
+    text-shadow: 0 0 3px #ffee005c, 0 0 20px #ffee005c;
+    /* text-shadow: 0 0 3px #FF0000, 0 0 20px #0000FF; */
+    /* опоздание */
+}
+.left-column-container {
+    background-color: #CB2D6F; /* Тёмно-розовый */
+    color: #DDDDDD; /* Светлый серый текст */
+    padding: 15px; /* Увеличенный размер отступов */
+    border-radius: 5px;
+    box-sizing: border-box;
+    font-size: 1.5em; /* Увеличенный размер текста */
+}

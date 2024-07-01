@@ -1,0 +1,963 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Простая таблица</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 200px;
+        }
+        table2 {
+            border-collapse: collapse;
+            width: 500px;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <table>
+        <tr>
+            <th id = "raspDate">Значение 1</th>
+        </tr>
+        <tr>
+            <td id="raspLessonName">Значение 2</td>
+        </tr>
+        <tr>
+            <td id="raspLessonTime">Значение 3</td>
+        </tr>
+        <tr>
+            <td  id="raspLessonTeacher">Значение 4</td>
+        </tr>
+        <tr>
+            <td id="raspLessonGroup">Значение 5</td>
+        </tr>
+        <a href = '/mainpage.html'>mainpage</a>
+        
+        <button type="button" onclick="save()" id="log_button">Запись</button>
+        <button type="button" onclick="load(5)" id="log_button">Чтение</button>
+        <button type="button" onclick="loadReports()" id="log_button">Чтение репортов</button>
+        <button type="button" onclick="addReportManually(5, 1, 2)" id="log_button2">Добавить репорт</button>
+    </table>
+    <table class="table2">
+      <tr>
+        <td id="uncheckedReports"> непроверенные отчёты</td>
+    </tr>
+      <tr>
+        <td id="raspLessonStudents">какие то студенты...</td>
+    </tr>
+    <tr>
+      <td id="raspLessonNames"></td>
+  </tr>
+  <tr>
+    <td id="raspLessonStudTable">студенты в группе?</td>
+</tr>
+<tr>
+  <td id="raspLessonStudentsOnPair">студенты на паре</td>
+</tr>
+<tr>
+<td id="reportsTable">все отчёты</td>
+</tr>
+    </table>
+    <table>
+        <tr>
+          <button type="button" onclick="addReportManually()" id="log_button2">Добавить репорт конкретный</button>
+        </tr>
+        <tr>
+            <textarea placeholder="mark" id="markReportText">0</textarea>
+        </tr>
+        <tr>
+          <textarea placeholder="rfid_uid" id="rfid_uidReportText">04 43 71 5A 5E 71 81</textarea>
+      </tr>
+      <tr>
+        <td placeholder="timestamp" id="timestampReportText">timestamp</td>
+    </tr>
+    </table>
+    <!-- <script type="module" src="json.js"> -->
+    <script type="module" src="json.js">
+    import data from './data.json'; 
+    var jsonData = data.raspDate; 
+    console.log ("jsonData " + jsonData)</script>
+    <script type="module" src="main.js"> </script>
+    <script type = "module" src="firebaseTemp.js"></script> 
+    <!-- database connection -->
+<script src="https://www.gstatic.com/firebasejs/7.14.6/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/7.14.6/firebase-database.js"></script>
+<!-- //<script type="module" src="./dataReading.js"> console.log(entireLessonData);</script> -->
+<script>
+//console.log(entireLessonData);
+var studentInfoBlock = document.getElementById('raspLessonStudents')
+var studentInfoNames = document.getElementById('raspLessonNames')
+var studentInfoStudTable = document.getElementById('raspLessonStudTable')
+var studentPairInfo = document.getElementById('raspLessonStudentsOnPair');
+var studentReportsBlock = document.getElementById('reportsTable');
+function sleep(milliseconds) {
+  var start = new Date().getTime();
+  for (var i = 0; i < 1e7; i++) {
+    if ((new Date().getTime() - start) > milliseconds){
+      break;
+    }
+  }
+}
+const firebaseConfig = {
+    apiKey: "AIzaSyDsu2cHBJuget5uyIf3abTrs2wZJqhLR7g",
+    authDomain: "smau-temp.firebaseapp.com",
+    databaseURL: "https://smau-temp-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "smau-temp",
+    storageBucket: "smau-temp.appspot.com",
+    messagingSenderId: "208565502888",
+    appId: "1:208565502888:web:4df62cc01d3ebf4729539d",
+    measurementId: "G-FWJBGEFGFY"
+  };
+// const firebaseConfig = {
+//   apiKey: "AIzaSyBJcZQaiwJHTndkWS5WEaQTquuE2SsMZ_g",
+//   authDomain: "smau-workplace.firebaseapp.com",
+//   databaseURL: "https://smau-workplace-default-rtdb.europe-west1.firebasedatabase.app/",
+
+//   projectId: "smau-workplace",
+//   storageBucket: "smau-workplace.appspot.com",
+//   messagingSenderId: "449194790558",
+//   appId: "1:449194790558:web:799b554a50ccaea50b758f",
+//   measurementId: "G-8VSXVK5PPF"
+// };
+  function dbConnect(){
+  firebase.initializeApp(firebaseConfig)
+    var database = firebase.database()
+    return database
+}
+var database = dbConnect()
+
+  function save(route){
+    database.ref('reports/' + 31).set({
+      mark: '5'
+    })
+
+    console.log("23");
+  }
+  async function addReportManually(){
+    document.getElementById('timestampReportText').value = await getUNIXtime();
+    var htmlReport = {"mark" : document.getElementById('markReportText').value,
+    "rfid_uid" : document.getElementById('rfid_uidReportText').value,
+     "timestamp" : document.getElementById('timestampReportText').value
+    };
+    
+    
+    database.ref('reports/' + allReportsAmount).update({
+      mark: htmlReport.mark,
+      rfid_uid: htmlReport.rfid_uid,
+      timestamp: htmlReport.timestamp
+    })
+    allReportsAmount = allReportsAmount + 1;
+    database.ref('reports/').update({
+      count: allReportsAmount
+    })
+    console.log("23");
+    
+  }
+  
+  async function addGroupJournalEntry(groupName){
+    var groupsInJournal = await readFromDB('journals/');
+    groupsInJournal = await groupsInJournal.count;
+    database.ref('journals/' + groupName).update({
+      count: 0
+    })
+    console.log("a group was added to the journal");
+    var groupsInJournal = await (parseInt(groupsInJournal, 10)) + 1;
+    console.log("вау...в новой группе номер " + groupsInJournal);
+  await database.ref('journals/').update({
+    count: groupsInJournal
+  })
+  }
+
+  async function addGroupDateJournalEntry(groupName, today){
+    var daysInGroup = await readFromDB('journals/' + groupName);
+    daysInGroup = await daysInGroup.count;
+    await database.ref('journals/' + groupName + '/' + today).set({
+      count: 0
+    })
+    console.log("a group DATE was added to the journal");
+
+    var newDaysInGroup = await (parseInt(daysInGroup, 10)) + 1;
+    console.log("вау...на новом дне номер " + newDaysInGroup);
+  await database.ref('journals/' + groupName).update({
+    count: newDaysInGroup
+  })
+  }
+
+  async function addGroupDatePairJournalEntry(groupName, today, pairNumber, subjectName){
+    var pairsInDay = await readFromDB('journals/' + groupName + '/' + today + '/');
+    pairsInDay = await pairsInDay.count;
+    
+    await database.ref('journals/' + groupName + '/' + today + '/' + pairNumber).set({
+      count: 0,
+      subject: subjectName
+    })
+    // database.reayf('journals/' + groupName + '/' + today).update({
+    //   count: 0
+    // })
+    console.log("a group DATE PAIR was added to the journal");
+    
+    var newPairsInDay = await (parseInt(pairsInDay, 10)) + 1;
+    console.log("вау...на паре " + newPairsInDay);
+  await database.ref('journals/' + groupName + '/' + today).update({
+    count: newPairsInDay
+  })
+  }
+
+  
+  async function addStudentPairJournalEntry(groupName, today, pairNumber, rfid, absence, mark, lastCheck){
+    
+    
+    // database.ref('journals/' + groupName + '/' + today + '/' + pairNumber).update({
+    //   count: 0
+    // })
+    // console.log("a group DATE was added to the journal");
+
+    studentNumberOnPair = await readFromDB('journals/' + groupName + '/' + today + '/' + pairNumber);
+    studentNumberOnPair = await studentNumberOnPair.count;
+  console.log("вау! добавили на пару человека с номером! " + studentNumberOnPair +"  "+ rfid);
+  console.log("вау! ну и номер! на паре: " + 'journals/' + groupName + '/' + today + '/' + pairNumber);
+  await database.ref('journals/' + groupName + '/' + today + '/' + pairNumber + '/' + studentNumberOnPair).set({
+      rfid: rfid,
+      lastCheck: lastCheck,
+      absence: absence,
+      mark: mark
+    })
+  var newStudentNumberOnPair = await (parseInt(studentNumberOnPair, 10)) + 1;
+  console.log("вау...теперь всего людей на паре " + newStudentNumberOnPair);
+  await database.ref('journals/' + groupName + '/' + today + '/' + pairNumber).update({
+    count: newStudentNumberOnPair
+  })
+  }
+
+  async function addStudentToPreviousJournalEntries(groupName, rfid, today, pairNumber){
+    var groupPeopleAmount = await readFromDB('groups/' + groupName);
+    console.log (groupPeopleAmount)
+    console.log (groupPeopleAmount.count + " - людей в группе")
+    groupPeopleAmount = groupPeopleAmount.count;
+    var pairJournalEntryChecking = await readFromDB('journals/'+groupName+'/'+today+'/'+pairNumber);
+    subjectName = pairJournalEntryChecking.subject;
+    console.log("Выдан предмет!" + subjectName);
+    console.log('ваши студенты на паре:' + 'journals/'+groupName+'/'+today+'/'+pairNumber);
+    
+    var allSubjectEntries = await  readFromDB('journals/'+groupName);
+    console.log("Выдан журнал группы!");
+    console.log(allSubjectEntries);
+    var allSubjectEntriesArray = await Object.entries(allSubjectEntries);
+    await allSubjectEntriesArray.pop();
+    console.log(allSubjectEntriesArray)
+    console.log(allSubjectEntriesArray[0][1])
+    console.log(allSubjectEntriesArray[1])
+    // console.log(allSubjectEntriesArray);
+    // console.log(allSubjectEntriesArray[0]); // группа/день
+    // console.log(allSubjectEntriesArray[0][0]); // группа/ название дня
+    // console.log(allSubjectEntriesArray[0][1]); // группа/ содержимое дня
+    // for (i in allSubjectEntriesArray[0][1]){
+    //   console.log(allSubjectEntriesArray[0][1][i]); // группа/ пара
+    //   console.log(allSubjectEntriesArray[0][1][i].count); // кол-во людей 
+    //   console.log(i); // группа/ пара
+    // }
+    // console.log(allSubjectEntriesArray[1][0]); // группа/ название дня
+    console.log("SOME BONKERS")
+    for (j in allSubjectEntriesArray){
+      console.log("NO_BONKERS_FOR_YOU_LOL")
+      for (i in allSubjectEntriesArray[j][1]){
+      console.log(allSubjectEntriesArray[j][1][i]); // группа/ пара
+      console.log('// группа/ пара'); 
+      console.log(allSubjectEntriesArray[j][1][i].count); // кол-во людей 
+      console.log(i); // группа/ пара
+      console.log(groupName + " " + allSubjectEntriesArray[j][0] + " " + i)
+      if (groupPeopleAmount != allSubjectEntriesArray[j][1][i].count){
+        console.log("NO_BONKERS_FOR_YOU")
+        //await addStudentPairJournalEntry(groupName, allSubjectEntriesArray[j][0], i, rfid, 0, 0, 0)
+      }
+      var journalEntryPresent = 0;
+      for (k in allSubjectEntriesArray[j][1][i]){
+        await console.log(allSubjectEntriesArray[j][1][i][k].rfid)
+        if (allSubjectEntriesArray[j][1][i][k].rfid == rfid) {journalEntryPresent = 1}
+        console.log(journalEntryPresent);
+      }
+      if (journalEntryPresent == 0 && i != 'count') await addStudentPairJournalEntry(groupName, allSubjectEntriesArray[j][0], i, rfid, 0, 0, 0)
+    }
+    }
+    
+     
+  }
+
+
+  async function updateStudentAbsence(groupName, today, pairNumber,rfid, absence, lastCheck, studentNumberOnPair){
+    
+  
+  console.log("вау! отметили посещаемость человека с номером! " + studentNumberOnPair +"  "+ rfid);
+  console.log("вау! ну и номер! на паре: " + 'journals/' + groupName + '/' + today + '/' + pairNumber);
+  await database.ref('journals/' + groupName + '/' + today + '/' + pairNumber + '/' + studentNumberOnPair).update({
+      lastCheck: lastCheck,
+      absence: absence
+    })
+  }
+
+  async function updateStudentMark(groupName, today, pairNumber,rfid, mark, lastCheck, studentNumberOnPair){
+    
+  
+    console.log("вау! отметили посещаемость человека с номером! " + studentNumberOnPair +"  "+ rfid);
+    console.log("вау! ну и номер! на паре: " + 'journals/' + groupName + '/' + today + '/' + pairNumber);
+    await database.ref('journals/' + groupName + '/' + today + '/' + pairNumber + '/' + studentNumberOnPair).update({
+        lastCheck: lastCheck,
+        mark: mark
+      })
+    }
+  
+  // async function AddStudentPairJournalEntry(groupName, today, pairNumber, rfid, absence, mark, lastCheck){
+    
+  //   // database.ref('journals/' + groupName + '/' + today + '/' + pairNumber).update({
+  //   //   count: 0
+  //   // })
+  //   // console.log("a group DATE was added to the journal");
+
+  //   studentNumberOnPair = await readFromDB('journals/' + groupName + '/' + today + '/' + pairNumber);
+  //   studentNumberOnPair = await studentNumber.count;
+  // console.log("вау! ну и номер! " + studentNumberOnPair + rfid);
+  // console.log("вау! ну и номер! " + 'journals/' + groupName + '/' + today + '/' + pairNumber);
+  // await database.ref('journals/' + groupName + '/' + today + '/' + pairNumber + '/' + studentNumberOnPair).set({
+  //     rfid: rfid,
+  //     lastCheck: lastCheck,
+  //     absence: absence,
+  //     mark: mark
+  //   })
+  // var newStudentNumberOnPair = await (parseInt(studentNumberOnPair, 10)) + 1;
+  // console.log("вау...на паре " + newStudentNumberOnPair);
+  // await database.ref('journals/' + groupName + '/' + today + '/' + pairNumber).update({
+  //   count: newStudentNumberOnPair
+  // })
+  // }
+
+
+  function saveChecked(){
+    database.ref('auditorium/1-333/lastSync').update({
+      reportsChecked: reportsChecked
+    })
+
+    console.log("235");
+  }
+  async function lastSyncTimeUpdate(){
+    var lastTimeChecked = await getUNIXtime();
+    subjectName = await readFromDB('journals/'+groupName+'/'+today+'/'+pairNumber);
+    subjectName = await subjectName.subject;
+    await database.ref('auditorium/1-333/lastSync').update({
+      lastTimeChecked:  lastTimeChecked,
+      lastPairNumber: pairNumber,
+      lastDay: today,
+      lastGroup: groupName,
+      lastSubject: subjectName,
+      //lastSubject: subjectName,
+      lastTeacher: teacherNameDB,
+      pairPeriod: pairPeriod
+      // lastTimeChecked:  lastTimeChecked,
+      // lastPairNumber: pairNumber,
+      // lastDay: today,
+      // lastGroup: groupName,
+      // lastSubject: subjectName,
+      // lastTeacher: "feature not added yet"
+    })
+    console.log("last time sync updated");
+  }
+
+async function raspLessonDataLoad(lessonData){
+  await database.ref('auditorium/1-333/lastSync/lastLessonData').update({
+      lessonDate:  lessonData.raspDate,
+      lessonName:  lessonData.lessonName,
+      lessonTime:  lessonData.lessonTime,
+      lessonTeacher: lessonData.lessonTeacher
+    })
+}
+
+  var today;
+  var groupName;
+  var entryStatus;
+  var teacherNameDB;
+  var pairNumber;
+  var pairPeriod;
+  async function checkJournals(){
+    var subjectName = document.getElementById("raspLessonName").innerText;
+    await console.log("rasppppp" + subjectName);
+    dateToday = new Date();
+    today = dateToday.getDate();
+    //////////////УДАЛИ ЕДИНИЦУ СВЕРХУ!!!!!!
+    today = today + "-" + (dateToday.getMonth()+1)	
+    today = today + "-" + (dateToday.getFullYear())	
+    groupName = document.getElementById("raspLessonTeacher").innerText;
+    var teacherIndex = groupName.indexOf("‧");
+    teacherNameDB = groupName.slice(0, teacherIndex);
+    console.log(groupName + "LessonTeacher data")
+    var groupIndex = groupName.indexOf("‧");
+    groupName = groupName.slice(groupIndex+2);
+    teacherName = document.getElementById("raspLessonTeacher").innerText;
+    pairPeriod = document.getElementById("raspLessonTime").innerText;
+    var periodIndex = pairPeriod.indexOf("‧");
+    pairPeriod = pairPeriod.slice(periodIndex+2);
+    // var teacherIndex = groupName.indexOf("‧");
+    // teacherName = groupName.slice(0, teacherIndex+2);
+    //console.log("grpu2 " + groupName)
+    console.log('journals/'+groupName+'/'+today)
+    var groupJournalEntry = await readFromDB('journals/'+groupName);
+    if (groupJournalEntry == undefined) {
+    await addGroupJournalEntry(groupName, today);
+    }
+    var groupDateJournalEntry = await readFromDB('journals/'+groupName+'/'+today);
+    if (groupDateJournalEntry == undefined) {
+    await addGroupDateJournalEntry(groupName, today);
+    }
+    pairNumber = document.getElementById("raspLessonTime").innerText.slice(0, 1);
+    
+    //var pairNumber = document.getElementById("raspLessonTime").innerText.slice(0, 1);
+    console.log("номер пары - "+ pairNumber);
+    
+    var pairJournalEntry = await readFromDB('journals/'+groupName+'/'+today+'/'+pairNumber);
+    if (pairJournalEntry == undefined) {
+    await addGroupDatePairJournalEntry(groupName, today, pairNumber, subjectName);
+    
+    pairJournalEntry = await readFromDB('journals/'+groupName+'/'+today+'/'+pairNumber);
+    }
+    //
+    console.log('ваши студенты на паре:' + pairJournalEntry);
+    
+    var studentsText = '';
+    console.log('ваши студенты на паре номер:' + pairJournalEntry.count);
+    // for (let i = 0; i<pairJournalEntry.count; i++){
+    //   //studentsText+=pairJournalEntry.count.val().a
+    //   studentsText+=pairJournalEntry;
+    // }
+    let pairArrayTest = [];
+    
+      for (let i in pairJournalEntry){
+      //studentsText+=pairJournalEntry.count.val().a
+      pairArrayTest.push([i, pairJournalEntry [i]]);
+      // studentPairInfo.textContent += "absence " + pairArrayTest[i][1].absence;
+      // studentPairInfo.textContent += " rfid " + pairArrayTest[i][1].rfid + " \n ";
+    }
+    
+    await console.log('ваши студенты на паре:');
+    await console.log(pairArrayTest);
+    return pairArrayTest;
+
+    
+    // let pairStudentsArray = [];
+    // if (pairJournalEntry.count != 0) {
+    //   for (let i = 0; i<count; i++){
+    //     var studentPairData = {"absence" : noLessons,
+    // "mark" : noLessons,
+    // "rfid" : noLessons};
+    //     pairStudentsArray.push(studentPairData);
+    //   }
+    // }
+    
+    /// reading students entries
+    
+    // var resultJournal = await readFromDB('journals/'+groupName+'/'+today);
+    // console.log("girlgone2" + groupJournalEntry);
+    // if (resultJournal.dayStatus == "made"){
+    //         console.log("studay " + resultJournal.dayStatus)
+    //         //data.today != null
+    //         entryStatus = 1;
+    //         console.log("entrystatus " + entryStatus);
+    //       }
+    //       else {
+    //         //console.log(data.count + " отчётов всего.");
+    //         entryStatus = 0;
+    //         console.log("entrystatus " + entryStatus);
+    //         //console.log("oh my there are " + allReportsAmount);
+    //         //jsonLastReport(data.count);
+    //       }
+
+  }
+  
+
+function addJournalEntry(){ 
+  database.ref('journals/'+groupName+'/'+today).set({
+      dayStatus: 'made',
+      count: '0'
+    })
+}
+
+async function addStudentToGroup(groupName, rfid, lastCheck, today, pairNumber){ 
+  studentNumber = await readFromDB('groups/'+groupName);
+  studentNumber = await studentNumber.count;
+  console.log("вау! ну и номер! " + studentNumber + rfid);
+  console.log("вау! ну и номер! " + 'groups/'+groupName);
+  await database.ref('groups/'+groupName+'/' + studentNumber).set({
+      rfid: rfid,
+      lastCheck: lastCheck,
+      patronym: "Отчество rfid " + rfid,
+      surname: "Фамилия №" + studentNumber,
+      name: "Имя №" + studentNumber
+    })
+  var newStudentNumber = await (parseInt(studentNumber, 10)) + 1;
+  console.log("вау... " + newStudentNumber);
+  await database.ref('groups/'+groupName).update({
+    count: newStudentNumber
+  })
+  //await addStudentToPreviousJournalEntries(groupName, rfid, today, pairNumber);
+}
+
+
+  //checkJournals()
+    var allReportsAmount;
+    var reportsChecked;
+    var checker = document.getElementById('raspLessonGroup')
+   function loadReports(){
+    var teacher_ref = database.ref('reports/');
+          teacher_ref.on('value', function(snapshot) {
+          var data = snapshot.val();
+          console.log(data);
+          // console.log(data.name);
+          // console.log(data.surname);
+          // console.log(data.login);
+          // console.log(data.password);
+          // console.log(data.subjects.database);
+          if (data == null){
+            console.log("ошибка");
+          }
+          else {
+            //console.log(data.count + " отчётов всего.");
+            allReportsAmount = data.count;
+            //console.log("oh my there are " + allReportsAmount);
+            //jsonLastReport(data.count);
+          }
+          //return allReportsAmount;
+    });
+    //console.log("oh my there are OUT OF " + allReportsAmount);
+    // sleep(2000);
+     if (allReportsAmount == undefined) { setTimeout(loadReports, 100);}
+     else {checker.innerText = allReportsAmount;
+      console.log(allReportsAmount + "- allReportsAmount")}
+    //console.log(allReportsAmount + "- allReportsAmount")
+    return data;
+}
+var studentInfo = []
+
+function load(reportNumber){
+    var teacher_ref = database.ref('reports/' + reportNumber);
+          teacher_ref.on('value', function(snapshot) {
+          var data = snapshot.val();
+          console.log(data);
+          //console.log(data.rfid_uid);
+          console.log(data.timestamp);
+          console.log(data.rfid_uid);
+          console.log(data.mark);
+          studentInfo[1] = data.timestamp;
+          studentInfo[2] = data.rfid_uid;
+
+          if (data == null){
+            console.log("Ошибка");
+          }
+          else{
+            console.log("успешно считан " + reportNumber + " отчёт.");
+          }
+          // if (studentInfo[1] == undefined) { setTimeout(load(reportNumber), 100);}
+          //   else {console.log(studentInfo[1] + "- studentInfo1")}
+          //   console.log(studentInfo[1] + "- studentInfo1")
+          studentInfoBlock.innerText = studentInfoBlock.innerText + "\n"+ studentInfo[1]+ "\n"+ studentInfo[2];
+          if (ArsId == data.rfid_uid) {
+            studentInfoNames.innerText = studentInfoNames.innerText + "\n" + ArsName+ "\n"+ ArsSurname+ "\n"+ ArsPatronym;
+          }
+          if (ticketId == data.rfid_uid) {
+            studentInfoNames.innerText = studentInfoNames.innerText + "\n" + ticketName+ "\n"+ ticketSurname+ "\n"+ ticketPatronym;
+          }
+    });
+}
+
+  async function readFromDB(routeDB) {
+    return new Promise((resolve, reject) => {
+        // simulate asynchronous operation
+        var result;
+        var teacher_ref = database.ref(routeDB);
+        teacher_ref.on('value', (snapshot) => {
+                    var data = snapshot.val();
+                  if (data == null){
+                    console.log("ошибка");
+                  }
+                  else {
+                    result = data;
+                    // console.log("! класс! читаем любое! " + result);
+                    // console.log(result);
+                    
+                  }
+                  resolve(result);
+                });
+    });
+}
+
+
+
+///в ячейку каждой пары добавить название предмета, в lastSync добюавить unix метку и последние данные расписания
+// своровать интерфейс, сделать систему вывода
+// разобраться с чат-ботом + эксель + firebase, сделать вывод по предметам для препода 
+// сделать мобильное приложение-заглушку (попытаться подключить к firebase, аккаунт для препода и генерацию идентификатора)
+
+  //setTimeout(trying1, 500);
+const studentNames = []
+const studentSurnames = []
+const studentPatronyms = []
+const studentIDs = []
+
+function loadStudent(rfid_uid){
+    var teacher_ref = database.ref('StudentIDs/' + rfid_uid);
+          teacher_ref.on('value', function(snapshot) {
+          var data = snapshot.val();
+          console.log(data);
+          //console.log(data.rfid_uid);
+          console.log(data.Name);
+          console.log(data.Patronym);
+          console.log(data.Surname);
+
+          // console.log(data.name);
+          // console.log(data.surname);
+          // console.log(data.login);
+          // console.log(data.password);
+          // console.log(data.subjects.database);
+          if (data == null){
+            console.log("Ошибка");
+          }
+          else{
+            console.log("успешно считан " + rfid_uid + " отчёт.");
+          }
+    });
+}
+
+async function checkGroup(groupName){
+  var groupInfoEntry = await readFromDB('groups/'+groupName);
+  
+  if (groupInfoEntry == undefined) {
+    database.ref('groups/' + groupName).update({
+      count: 0
+    })
+    groupInfoEntry = await readFromDB('groups/'+groupName);
+    }
+  return groupInfoEntry;  
+}
+
+// async function loadGroup(groupName){
+//   console.log("имя группы:"+ groupName);
+//   //var groupStudents = await readFromDB('groups/'+ groupName);
+//   checkGroup(groupName);
+//   var groupStudents = await checkGroup(groupName);
+//   var studentString = " ";
+//   console.log(groupStudents);
+//   studentArray = Object.entries(groupStudents);
+//     for (let i = 0; i <= groupStudents.count-1; i++)
+//     {
+//       console.log("студент! "  + studentArray[i][1].name);
+//       console.log("студент! "  + studentArray[i][1].surname);
+//     console.log(studentArray[i]);
+//     studentString = studentString + studentArray[i][1].surname + " " + studentArray[i][1].name  +  " " + studentArray[i][1].patronym + "\n";  
+//     }
+//     studentInfoStudTable.innerText = studentInfoStudTable.innerText + studentString;
+//   // for (elem of groupStudents) {
+//   //   console.log(elem);
+//   //   console.log("true");
+//   // }
+// }
+
+//loadGroup("БПОи-20-01");
+
+async function loadGroup(groupName){
+  console.log("имя группы:"+ groupName);
+  //var groupStudents = await readFromDB('groups/'+ groupName);
+  //checkGroup(groupName);
+  var groupStudents = await checkGroup(groupName);
+  var studentString = " ";
+  console.log("groupStudents");
+  console.log(groupStudents);
+  studentArray = Object.entries(groupStudents);
+  console.log(" but object entries");
+  console.log(studentArray);
+    for (let i = 0; i <= groupStudents.count-1; i++)
+    {
+      console.log("студент! "  + studentArray[i][1].name);
+      console.log("студент! "  + studentArray[i][1].surname);
+    console.log(studentArray[i]);
+    studentString = studentString + studentArray[i][1].surname + " " + studentArray[i][1].name  +  " " + studentArray[i][1].patronym + "\n";  
+    }
+    studentInfoStudTable.innerText = studentInfoStudTable.innerText + studentString;
+  // for (elem of groupStudents) {
+  //   console.log(elem);
+  //   console.log("true");
+  // }
+  return studentArray
+}
+
+
+
+async function addSubjectToTeacher(subjectName, groupName, teacherPosition){
+    var subjectInfoEntry = await readFromDB('teachers/' + teacherPosition + '/subjects');
+    console.log(subjectInfoEntry);
+    var subjPosition = subjectInfoEntry.count
+    await database.ref('teachers/' + teacherPosition + '/subjects/' + subjPosition).set({
+      name: subjectName,
+      groupName: groupName
+    })
+    await database.ref('teachers/' + teacherPosition + '/subjects').update({
+      count: subjPosition + 1
+    })
+    //groupInfoEntry = await readFromDB('groups/'+groupName);
+}
+
+async function checkTeacher(testRFID, groupName, today, pairNumber){
+  var teachers = await readFromDB('teachers/');
+  var teacherStatus = 0;
+  var teacherPosition = -1;
+  var subjectStatus = 0;
+  teacherArray = await Object.entries(teachers);
+  await teacherArray.pop();
+  console.log(teacherArray);
+  for (let i in teacherArray){
+    if (teacherArray[i][1].rfid == testRFID) {
+        teacherStatus = await 1;
+        teacherPosition = await i;
+    }
+
+  }
+  if (teacherStatus == 1) {
+    subjectName = await readFromDB('journals/'+groupName+'/'+today+'/'+pairNumber);
+    subjectName = await subjectName.subject;
+    console.log(teacherArray[teacherPosition][1].subjects)
+    for (k in teacherArray[teacherPosition][1].subjects){
+        if (teacherArray[teacherPosition][1].subjects[k].name == subjectName && teacherArray[teacherPosition][1].subjects[k].groupName == groupName) {
+        console.log ("ОН ЕСТЬ!!");
+        subjectStatus = 1;
+    }
+    else {
+        // console.log(subjectName)
+        // console.log(teacherArray[teacherPosition][1].subjects[0].name)
+        // console.log(teacherArray[teacherPosition][1].subjects[0].groupName)
+        // console.log(groupName)
+        console.log ("ЕГО НЕТ!!");  
+    };
+    
+    }
+    
+    if (subjectStatus == 0) addSubjectToTeacher(subjectName, groupName, teacherPosition);
+    //console.log(subjectName);
+  }
+  return teacherStatus;
+}
+
+
+async function reportAnalyzer(allReportsAmount, reportsChecked, today, groupName, pairNumber, studentsOnPairArray, studentsInGroupArray){
+  var reports = await readFromDB('reports/');
+  console.log(reports);
+  await console.log("all reports");
+  let reportsArray = await [];
+     for (let i = reportsChecked; i < allReportsAmount; i++){
+      //studentsText+=pairJournalEntry.count.val().a
+      await reportsArray.push([i, reports [i]]);
+    }
+    console.log("allReportsAmount - " + allReportsAmount + " reportsChecked - " + reportsChecked);
+
+    // for (let i = reportsChecked; i < allReportsAmount; i++){
+    //   reportsArray[i][1].rfid_uid
+    // }
+
+    for (i in reportsArray){
+      studentReportsBlock.textContent += " \n " + i + " - mark " + reportsArray[i][1].mark;
+      studentReportsBlock.textContent += " rfid " + reportsArray[i][1].rfid_uid + " \n ";
+    }
+    await console.log("Вcе ваши главаши репорты массивом ");
+     await console.log(reportsArray);
+     await console.log("Все студенты на паре массивом ");
+     await console.log(studentsOnPairArray);
+     await console.log("Все студенты в группе массивом ");
+     await console.log(studentsInGroupArray);
+     await console.log(studentsOnPairArray.length + "bomba");
+    for (i in reportsArray){
+      var personPresent = 0;
+      for (j in studentsInGroupArray){
+        if (reportsArray[i][1].rfid_uid == studentsInGroupArray[j][1].rfid){
+          personPresent = 1;
+          console.log("persona wow found" + personPresent + " rfid " + reportsArray[i][1].rfid_uid);
+        }
+      }
+      if (personPresent == 0){
+        ///ПРОДОЛЖАЙ БЛИННН ЗДЕСЬ
+        var testForTeacherRFID = reportsArray[i][1].rfid_uid + ""
+        var teacherCheck = await checkTeacher(testForTeacherRFID, groupName, today, pairNumber);
+        await console.log("проверка на учителя:")
+        await console.log(testForTeacherRFID)
+        await console.log(teacherCheck);
+        if (teacherCheck == 0) {
+          await console.log("persona wow not made" + personPresent + " rfid " + reportsArray[i][1].rfid_uid);
+        var lastCheckNewStudent = await getUNIXtime();
+        await addStudentToGroup(groupName, reportsArray[i][1].rfid_uid, reportsArray[i][1].timestamp, today, pairNumber);
+        personPresent = 1;
+        console.log("persona wow made" + personPresent + " rfid " + reportsArray[i][1].rfid_uid);
+        }
+        
+      }
+    
+    }
+    
+     /////////////////проставление журналов
+    studentsOnPairArray = await checkJournals();
+    studentsInGroupArray = await loadGroup(groupName);
+    await console.log(studentsOnPairArray.length + "biba");
+    for (i in studentsOnPairArray)
+    {await console.log(studentsOnPairArray[i][0] + "pupi! " + studentsOnPairArray[i][1]);
+    }
+    studentsInGroupArray.pop();
+    console.log("студентов в группе теперь: " + studentsInGroupArray);
+    console.log(studentsInGroupArray);
+    if(studentsOnPairArray.length <= 1){
+      console.log("Пипяо, тут пусто!" + studentsOnPairArray.length);
+      for (i in studentsInGroupArray){
+        await addStudentPairJournalEntry(groupName, today, pairNumber, studentsInGroupArray[i][1].rfid, 0, 0, studentsInGroupArray[i][1].lastCheck);}
+        await addStudentToPreviousJournalEntries(groupName, studentsInGroupArray[i][1].rfid, today, pairNumber);
+      }
+    else {
+      studentsOnPairArray.pop();
+      console.log("удалили посл элемент студентов на паре: ");
+      console.log(studentsOnPairArray);
+      var personOnPairPresent;
+      for (i in studentsInGroupArray){
+        personOnPairPresent = 0;
+        for (j in studentsOnPairArray){
+          //personOnPairPresent = 0;
+          if (studentsInGroupArray[i][1].rfid == studentsOnPairArray[j][1].rfid){
+            personOnPairPresent = 1;
+          }
+        }
+        if (personOnPairPresent == 0){
+            console.log("вау человека на пару не добавили" + personOnPairPresent + " rfid " + studentsInGroupArray[i][1].rfid);
+            await addStudentPairJournalEntry(groupName, today, pairNumber, studentsInGroupArray[i][1].rfid, 0, 0, studentsInGroupArray[i][1].lastCheck);
+            await addStudentToPreviousJournalEntries(groupName, studentsInGroupArray[i][1].rfid, today, pairNumber);
+            personOnPairPresent = 1;
+          }
+
+        }
+    }
+    /////////////////////////////////////
+    // var currentUNIXtime =getUNIXtime();
+    
+    /////////////////распознавание отчётов
+    if (reportsArray.length>0) {
+      studentsOnPairArray = await checkJournals();
+      await studentsOnPairArray.pop();
+    console.log("студенты на паре: пора оценивать! ");
+    console.log(reportsArray);
+    console.log("а вот и список студентов на паре: пора оценивать! ");
+    console.log(studentsOnPairArray);
+    var reportApplied;
+    for (i in reportsArray) {
+      reportApplied = 0;
+        for (j in studentsOnPairArray){
+          if (reportsArray[i][1].rfid_uid == studentsOnPairArray[j][1].rfid){
+            if (reportsArray[i][1].timestamp >= studentsOnPairArray[j][1].lastCheck){
+              if (studentsOnPairArray[j][1].absence == 0){
+                updateStudentAbsence(groupName, today, pairNumber, reportsArray[i][1].rfid_uid, 1, reportsArray[i][1].timestamp, studentsOnPairArray[j][0]);
+              }
+              if (reportsArray[i][1].mark >=3 && reportsArray[i][1].mark <=5){
+                console.log("подтверждающий: ")
+                var confirmingID = await parseInt(i) + 1;
+                console.log(confirmingID);
+                console.log(reportsArray[i][1]);
+                var confirmingRFID = reportsArray[confirmingID][1].rfid_uid;
+                var confirmationStatus = await checkTeacher(confirmingRFID, groupName, today, pairNumber);
+                if (confirmationStatus == 1) {await updateStudentMark(groupName, today, pairNumber, reportsArray[i][1].rfid_uid, reportsArray[i][1].mark, reportsArray[i][1].timestamp, studentsOnPairArray[j][0]);}
+              }
+            }
+          }
+        }
+      }
+    }
+    
+}
+async function getUNIXtime(){
+  currentUNIXtime = Date.now()/1000;
+  currentUNIXtime = currentUNIXtime - currentUNIXtime%1;
+  console.log(currentUNIXtime);
+  return currentUNIXtime;
+};
+
+// async function createReportArray() {
+//     return new Promise((resolve, reject) => {
+      
+//         // simulate asynchronous operation
+//         var result;
+//         let reportsArray2 = [];
+//       for (let i in reports){
+//       //studentsText+=pairJournalEntry.count.val().a
+//       reportsArray.push([i, reports [i]]);
+//        studentReportsBlock.textContent += " \n " + i + " - mark " + reportsArray[i][1].mark;
+//        studentReportsBlock.textContent += " rfid " + reportsArray[i][1].rfid_uid + " \n ";
+//     }
+//     result = reportsArray2;
+//     resolve(result);
+                
+//     });
+// }
+
+
+  var ticketId = "A3 A7 82 13";
+  var ticketName = "Ticket"
+  var ticketPatronym = "TicketPatronym"
+  var ticketSurname = "TicketSurname"
+
+  var ArsId = "04 46 CD 5A 5E 71 81";
+  var ArsName = "Arsen"
+  var ArsPatronym = "Ruslanovich"
+  var ArsSurname = "Islamgulov"
+
+  
+
+     async function syncCheck2(){
+      allReportsAmount = await readFromDB('reports/count');
+      reportsChecked = await readFromDB('auditorium/1-333/lastSync/reportsChecked');
+      var studentsOnPairArray = await checkJournals();
+      var studentsInGroupArray = await loadGroup(groupName);
+      //checkGroup(groupName);
+      reportAnalyzer(allReportsAmount, reportsChecked, today, groupName, pairNumber,studentsOnPairArray, studentsInGroupArray);
+      var uncheckedReportsBox = document.getElementById('uncheckedReports');
+      uncheckedReportsBox.innerText = "allReportsAmount - " + allReportsAmount + " reportsChecked - " + reportsChecked;
+      lastSyncTimeUpdate();
+      
+        var diff = allReportsAmount - reportsChecked;
+        console.log(diff + " разница")
+        if (diff == 0) {
+              console.log("standard")
+              checker.innerText = 'всё по старому';}
+            else if (diff > 0){
+              console.log("more")
+              checker.innerText = 'новые данные!';
+              while (diff != 0){
+                load(reportsChecked);
+                console.log(studentInfo[1] + "- studentInfo12")
+                // loadName()
+                reportsChecked = reportsChecked + 1
+                studentInfoBlock.innerText = studentInfoBlock.innerText + "\n"+ studentInfo[2];
+                console.log(reportsChecked + " - reportsChechekd")
+                diff = allReportsAmount - reportsChecked;
+                setTimeout(saveChecked, 100);
+                
+              }
+                   
+            }
+            else {
+              console.log("weird")
+              checker.innerText = 'странно...';}
+     }
+     setTimeout(syncCheck2, 100);
+     //addStudentToPreviousJournalEntries('50578БТЭ-23-01-1', 0, '4-6-2024', 3)
+     setTimeout(function(){
+    // //var table = document.getElementById("dynamic-table").innerHTML = "";
+    // createTable(data2, dates, names, studentsInGroupForTable, studentsOnPairForTable);
+    location.reload();
+}, 1000);
+</script> 
+
+</body>
+</html>
